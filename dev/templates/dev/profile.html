@@ -1,0 +1,1259 @@
+{% extends 'dev/base.html' %}
+
+{% block title %}Profile{% endblock %}
+{% block extra_styles %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-form {
+            max-width: 1200px;
+            gap: 3rem;
+            padding: 2rem;
+        }
+
+        .profile-left,
+        .profile-right {
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .profile-header h2 {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .profile-picture, .profile-initial {
+            width: 150px;
+            height: 150px;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-picture:hover, .profile-initial:hover {
+            transform: scale(1.05);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: #34495e;
+            margin-bottom: 0.75rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"],
+        input[type="time"],
+        select {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+
+        .skills-section {
+            
+            border: 2px solid #e9ecef;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .skills-grid {
+            gap: 15px;
+        }
+
+        .skill-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .skill-item:hover {
+            background: #e9ecef;
+        }
+
+        .availability-section {
+           
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .time-card {
+            padding: 1.5rem;
+        }
+
+        .availability-tabs {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            gap: 2rem;
+        }
+
+        .availability-tabs label {
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .availability-tabs label:hover {
+            background: #e9ecef;
+        }
+
+        .projects-section {
+            background: #fff;
+         
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .project-item {
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        button[type="submit"], 
+        .btn-primary {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        button[type="submit"]:hover,
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+            background: linear-gradient(45deg, #2980b9, #3498db);
+        }
+
+        /* Modal improvements */
+        .modal-content {
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .modal-form-group input,
+        .modal-form-group textarea {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-modal {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .errorlist {
+            color: #dc3545;
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+
+        .time-range {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .time-field {
+            flex: 1;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .availability-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            
+        }
+        
+        .time-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .time-group h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .time-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .availability-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .availability-tabs label {
+            cursor: pointer;
+        }
+
+        .availability-tabs input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .availability-tabs span {
+            font-weight: normal;
+        }
+
+        /* Hide all time inputs by default except weekday */
+        .time-field input[type="time"] {
+            display: none;
+        }
+        
+        .time-field input.weekday-time {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 20px auto;
+            padding: 25px;
+            border: none;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* Improved form styling */
+        .modal-form-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .modal-form-group input,
+        .modal-form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .modal-form-group input:focus,
+        .modal-form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .modal-form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Close button */
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Modal buttons */
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-save {
+            background-color: #007bff;
+            border: none;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Projects list styling */
+        .projects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-item {
+            background: #f8f9fa;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .project-item:hover {
+            background: #e9ecef;
+        }
+
+        .project-link {
+            color: #495057;
+            text-decoration: none;
+            display: block;
+        }
+
+        .projects-section {
+          
+          
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .projects-list {
+            margin: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .project-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+        }
+
+        .project-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .project-link {
+            color: #495057;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-link:hover {
+            color: #007bff;
+        }
+
+        .project-client {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .no-projects {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            background: white;
+            border-radius: 6px;
+            border: 1px dashed #dee2e6;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-unavailable {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .availability-section {
+            
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .current-status {
+            margin-bottom: 1rem;
+        }
+
+        .manual-override {
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-initial {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--primary-color, #007bff);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 3rem;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .profile-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 100%;
+            padding: 0;
+        }
+
+        .profile-column {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 2rem;
+            height: fit-content;
+            min-height: 600px; /* Set equal minimum height */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* First column */
+        .profile-column:first-child {
+            overflow: visible !important;
+        }
+
+        /* Second column (skills) */
+        .profile-column:nth-child(2) {
+            overflow-y: auto;
+        }
+
+        .skills-container {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* Third column */
+        .profile-column:last-child {
+            overflow: visible;
+        }
+
+        .profile-header {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-header-content {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .profile-picture-container {
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex-grow: 1;
+        }
+
+        .profile-picture, .profile-initial {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-initial {
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .profile-header h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .profile-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Update form group spacing */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .profile-form {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .profile-column {
+                min-height: auto;
+            }
+        }
+
+        /* Skills section styles */
+        .skills-section {
+            
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .skills-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-top: 1rem;
+            max-height: calc(90vh - 500px);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Custom scrollbar */
+        .skills-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .skills-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .skills-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .skills-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Additional Info section */
+        .additional-info {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Update spacing for all columns */
+        .profile-column > div:not(:last-child) {
+            margin-bottom: 1.25rem;
+        }
+
+        /* Ensure content doesn't overflow */
+        .profile-column > * {
+            max-width: 100%;
+        }
+
+        /* Make form groups more compact */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Adjust input sizes */
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            padding: 0.75rem;
+        }
+
+        /* Make headings more compact */
+        h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.25rem;
+        }
+
+        /* Update profile header to be more compact */
+        .profile-header {
+            margin-bottom: 1.25rem;
+            padding-bottom: 1.25rem;
+        }
+
+        .profile-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .profile-subtitle {
+            font-size: 0.9rem;
+        }
+
+        /* Ensure third column sections fit */
+        .profile-column:last-child {
+            gap: 1.25rem;
+        }
+
+        .availability-section,
+        .projects-section {
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Make form groups more compact in first column */
+        .profile-column:first-child .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-column:first-child .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Adjust input sizes for better fit */
+        .profile-column:first-child input[type="text"],
+        .profile-column:first-child input[type="file"] {
+            padding: 0.5rem 0.75rem;
+        }
+
+        /* Adjust bio input field size */
+        .form-group textarea[name="bio"] {
+            height: 50px;  /* Reduce height */
+            min-height: 50px;  /* Set minimum height */
+            max-height: 50px; /* Set maximum height */
+            resize: vertical;  /* Allow vertical resizing within limits */
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Make the container more compact */
+        .additional-info {
+            margin-bottom: 1rem;
+        }
+
+        .additional-info .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        /* Adjust spacing after bio field */
+        .form-group textarea[name="bio"] + .help-text {
+            margin-top: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        /* Consistent column sizing */
+        .profile-column:last-child {
+            height: calc(100vh - 100px); /* Match second column height */
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        /* Adjust sections in third column */
+        .availability-section,
+        .projects-section {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Make time card more compact */
+        .time-card {
+            padding: 1rem;
+        }
+
+        /* Adjust projects list */
+        .projects-list {
+            max-height: 200px; /* Limit height */
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .project-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Adjust button spacing */
+        button[type="submit"], 
+        .btn-primary {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+        }
+
+        /* Custom scrollbar for projects list */
+        .projects-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .projects-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .projects-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .projects-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Third column adjustments */
+        .profile-column:last-child {
+            height: fit-content;
+            gap: 1rem;
+            overflow-y: visible;
+        }
+
+        /* Compact availability section */
+        .availability-section {
+            margin-top: 0;
+            padding: 1rem;
+            
+        }
+
+        .time-card {
+            padding: 0.75rem;
+        }
+
+        .availability-tabs {
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .time-range {
+            gap: 1rem;
+        }
+
+        /* Compact projects section */
+        .projects-section {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .projects-list {
+            max-height: none;
+            overflow: visible;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .project-item {
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Adjust button sizes */
+        button[type="submit"], 
+        .btn-primary {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+        }
+
+        /* Remove scrollbars */
+        .projects-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .profile-column:last-child::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Make headings more compact */
+        .profile-column:last-child h3 {
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        /* Adjust spacing between sections */
+        .profile-column:last-child > div:not(:last-child) {
+            margin-bottom: 0.75rem;
+        }
+
+        /* Style for the save button in header */
+        .header-save-btn {
+            margin: 0 !important;
+            padding: 0.6rem 1.2rem !important;
+            width: auto !important;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            height: fit-content;
+        }
+
+        /* Remove old save button styles */
+        .profile-column:last-child > button:last-child {
+            display: none;
+        }
+
+        /* Ensure all columns have same height */
+        .profile-column {
+            height: fit-content;
+        }
+
+        /* Make sections fill available space */
+        .skills-section,
+        .projects-section {
+            flex-grow: 1;
+        }
+    </style>
+    {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="post" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            
+            <!-- Column 1: Profile Header + Essential Info -->
+            <div class="profile-column">
+                <!-- Merged Header -->
+                <div class="profile-header">
+                    <div class="profile-header-content">
+                        <div class="profile-picture-container">
+                            {% if profile.profile_picture %}
+                                <img src="{{ profile.profile_picture.url }}" alt="{{ profile.display_name }}" class="profile-picture">
+                            {% else %}
+                                <div class="profile-initial">
+                                    {{ profile.user.get_full_name|default:profile.user.username|make_list|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="profile-info">
+                            <h2>{{ profile.display_name|default:"Complete Your Profile" }}</h2>
+                            <p class="profile-subtitle">{{ profile.title|default:"Add your professional title" }}</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary header-save-btn">Save Profile</button>
+                    </div>
+                </div>
+
+                <!-- Essential Information -->
+                {% for field in form %}
+                    {% if field.name in 'display_name,title,profile_picture' %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <p class="help-text">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Column 2: Additional Info + Skills -->
+            <div class="profile-column">
+                <!-- Additional Information -->
+                <div class="additional-info">
+                    <h3>Additional Information</h3>
+                    {% for field in form %}
+                        {% if field.name in 'bio,hourly_rate' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <p class="help-text">{{ field.help_text }}</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Skills Section with Scroll -->
+                <div class="skills-section">
+                    <h3>Skills</h3>
+                    <div class="skills-container">
+                        <div class="skills-grid">
+                            {{ form.skills }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Availability + Projects -->
+            <div class="profile-column">
+                <!-- Availability Section -->
+                <div class="availability-section">
+                    <h3>Availability</h3>
+                    <div class="time-card">
+                        <div class="availability-tabs">
+                            <label>
+                                <input type="radio" name="{{ form.availability_type.name }}" value="weekday" checked>
+                                <span>Weekday</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="{{ form.availability_type.name }}" value="weekend">
+                                <span>Weekend</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="{{ form.availability_type.name }}" value="temporary">
+                                <span>Just for Today</span>
+                            </label>
+                        </div>
+                        
+                        <div class="time-range">
+                            <div class="time-field">
+                                <label>From</label>
+                                {{ form.weekday_from }}
+                                {{ form.weekend_from }}
+                                {{ form.temp_from }}
+                            </div>
+                            <div class="time-field">
+                                <label>To</label>
+                                {{ form.weekday_to }}
+                                {{ form.weekend_to }}
+                                {{ form.temp_to }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Section -->
+                <div class="projects-section">
+                    <h3>Projects</h3>
+                    <div class="projects-list">
+                        {% for project in projects %}
+                            <div class="project-item">
+                                <a href="{% url 'dev:dev_project_detail' pk=project.id %}" class="project-link">
+                                    {{ project.name }}
+                                    {% if project.client %}
+                                        <span class="project-client">({{ project.client }})</span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% empty %}
+                            <div class="no-projects">No projects yet</div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="openProjectModal()">Add New Project</button>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </div>
+        </form>
+
+        <!-- Modal remains unchanged -->
+        <div id="projectModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Add New Project</h3>
+                <form id="projectForm">
+                    <div class="modal-form-group">
+                        <label for="projectName">Project Name*</label>
+                        <input type="text" id="projectName" required 
+                               placeholder="Enter project name">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="projectReadme">Project Description*</label>
+                        <textarea id="projectReadme" required 
+                                 placeholder="Describe your project..."></textarea>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="deployedUrl">Deployed URL</label>
+                        <input type="url" id="deployedUrl" 
+                               placeholder="https://...">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="githubUrl">GitHub URL*</label>
+                        <input type="url" id="githubUrl" required 
+                               placeholder="https://github.com/...">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="projectClient">Client</label>
+                        <input type="text" id="projectClient" 
+                               placeholder="Client name or organization">
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-modal btn-cancel" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-modal btn-save">Save Project</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const helpText = document.getElementById('availability-help');
+        const radioButtons = document.querySelectorAll('input[name="{{ form.availability_type.name }}"]');
+        const weekdayInputs = document.querySelectorAll('.weekday-time');
+        const weekendInputs = document.querySelectorAll('.weekend-time');
+        const tempInputs = document.querySelectorAll('.temp-time');
+        
+        function updateDisplay(value) {
+            weekdayInputs.forEach(input => input.style.display = value === 'weekday' ? 'block' : 'none');
+            weekendInputs.forEach(input => input.style.display = value === 'weekend' ? 'block' : 'none');
+            tempInputs.forEach(input => input.style.display = value === 'temporary' ? 'block' : 'none');
+            
+            switch(value) {
+                case 'weekday':
+                    helpText.textContent = 'Set your weekday availability hours';
+                    break;
+                case 'weekend':
+                    helpText.textContent = 'Set your weekend availability hours';
+                    break;
+                case 'temporary':
+                    helpText.textContent = 'Set your availability hours just for today';
+                    break;
+            }
+        }
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                updateDisplay(e.target.value);
+            });
+        });
+    });
+
+    const modal = document.getElementById('projectModal');
+    const closeBtn = document.getElementsByClassName('close')[0];
+
+    function openProjectModal() {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore background scrolling
+        document.getElementById('projectForm').reset();
+    }
+
+    closeBtn.onclick = closeModal;
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // Handle escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeModal();
+        }
+    });
+
+    // Prevent modal close when clicking modal content
+    document.querySelector('.modal-content').addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+
+    document.getElementById('projectForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+        
+        try {
+            const projectData = {
+                name: document.getElementById('projectName').value.trim(),
+                readme: document.getElementById('projectReadme').value.trim(),
+                deployed_url: document.getElementById('deployedUrl').value.trim(),
+                github_url: document.getElementById('githubUrl').value.trim(),
+                client: document.getElementById('projectClient').value.trim()
+            };
+
+            const response = await fetch('{% url "dev:project_create_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(projectData)
+            });
+
+            if (response.ok) {
+                const project = await response.json();
+                const projectsList = document.querySelector('.projects-list');
+                
+                const projectDiv = document.createElement('div');
+                projectDiv.className = 'project-item';
+                projectDiv.innerHTML = `
+                    <a href="/dev/project/${project.id}/" class="project-link">
+                        ${project.name}
+                    </a>
+                `;
+                
+                projectsList.appendChild(projectDiv);
+                closeModal();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to save project. Please try again.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save Project';
+        }
+    });
+
+    document.getElementById('setAvailability').addEventListener('click', async function() {
+        const duration = document.getElementById('availabilityDuration').value;
+        const response = await fetch('{% url "dev:toggle_availability" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `duration=${duration}`
+        });
+        
+        const data = await response.json();
+        if (data.status === 'success') {
+            const statusBadge = document.getElementById('availabilityStatus');
+            statusBadge.textContent = 'Available';
+            statusBadge.className = 'status-badge status-available';
+            
+            // Optional: Show when availability will end
+            const endsAt = new Date(data.ends_at);
+            alert(`You will be shown as available until ${endsAt.toLocaleString()}`);
+        } else {
+            alert(data.message || 'Failed to update availability');
+        }
+    });
+    </script>
+{% endblock %}

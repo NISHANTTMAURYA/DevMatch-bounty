@@ -1,0 +1,60 @@
+{% extends 'dev/base.html' %}
+
+{% block title %}View Requests{% endblock %}
+
+{% block extra_styles %}
+    .requests-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    // ... (rest of the existing styles)
+{% endblock %}
+
+{% block content %}
+    <div class="requests-container">
+        <h2>Project Requests</h2>
+        
+        {% for request in requests %}
+            <div class="request-card">
+                <div class="request-header">
+                    <h3>{{ request.project.title }}</h3>
+                    <span class="status-badge status-{{ request.status }}">{{ request.status|title }}</span>
+                </div>
+
+                <div class="customer-info">
+                    <div class="customer-avatar">
+                        {{ request.project.customer.username|first|upper }}
+                    </div>
+                    <div>
+                        <strong>Customer:</strong> {{ request.project.customer.username }}
+                        <br>
+                        <small>Request received: {{ request.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                </div>
+
+                <p><strong>Project Budget:</strong> ${{ request.project.budget }}</p>
+                <p><strong>Duration:</strong> {{ request.project.duration }} hours</p>
+                <p><strong>Message:</strong> {{ request.message }}</p>
+
+                {% if request.status == 'pending' %}
+                    <div class="request-actions">
+                        <form method="POST" action="{% url 'dev:handle_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="accept">
+                            <button type="submit" class="btn accept-btn">Accept</button>
+                        </form>
+                        <form method="POST" action="{% url 'dev:handle_request' request.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn reject-btn">Reject</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No requests found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

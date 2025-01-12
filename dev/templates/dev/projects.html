@@ -1,0 +1,368 @@
+{% extends 'dev/base.html' %}
+
+{% block title %}My Projects{% endblock %}
+
+{% block content %}
+<div class="projects-section">
+    <div class="section-header">
+        <h1 class="section-title">My Projects</h1>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-status="all">All</button>
+            <button class="filter-btn" data-status="open">Open</button>
+            <button class="filter-btn" data-status="in_progress">In Progress</button>
+            <button class="filter-btn" data-status="completed">Completed</button>
+            <button class="filter-btn" data-status="cancelled">Cancelled</button>
+        </div>
+    </div>
+
+    <div class="projects-grid">
+        {% if projects %}
+            {% for project in projects|dictsortreversed:"created_at" %}
+                <div class="project-card" data-status="{{ project.status }}">
+                    <div class="project-header">
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        <span class="status-badge status-{{ project.status|lower }}">
+                            {{ project.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="project-details">
+                        <div class="project-detail-item">
+                            <span class="detail-label">Client</span>
+                            <span class="detail-value">{{ project.customer.user.first_name }} {{ project.customer.user.last_name }}</span>
+                        </div>
+                        <div class="project-detail-item">
+                            <span class="detail-label">Budget</span>
+                            <span class="detail-value">${{ project.budget }}</span>
+                        </div>
+                        <div class="project-detail-item">
+                            <span class="detail-label">Duration</span>
+                            <span class="detail-value">{{ project.duration }} days</span>
+                        </div>
+                        <div class="project-detail-item">
+                            <span class="detail-label">Created</span>
+                            <span class="detail-value">{{ project.created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="project-actions">
+                        <a href="{% url 'dev:customer_project_detail' project.id %}" class="btn btn-primary">View Details</a>
+                        {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" class="link-btn">
+                                <i class="fab fa-github"></i> Code
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'chat:room' project.id %}" class="link-btn">
+                            <i class="fas fa-comments"></i> Chat
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-illustration">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3>No Projects Found</h3>
+                <p>You don't have any projects matching the selected filter.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        --card-border-radius: 12px;
+    }
+
+    .projects-section {
+        padding: 2rem max(2rem, 5%);
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(to right, rgba(99, 102, 241, 0.05), transparent);
+        border-radius: var(--card-border-radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.625rem 1.25rem;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .filter-btn:hover {
+        border-color: #6366f1;
+        color: #6366f1;
+        transform: translateY(-1px);
+    }
+
+    .filter-btn.active {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .project-card {
+        background: white;
+        border-radius: var(--card-border-radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .project-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(99, 102, 241, 0.12);
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .project-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.875rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .project-details {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .project-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .detail-value {
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .project-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 0.625rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+    }
+
+    .link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        border: 1px solid #e2e8f0;
+    }
+
+    .link-btn:hover {
+        background: #f1f5f9;
+        border-color: #6366f1;
+        color: #6366f1;
+        transform: translateY(-1px);
+    }
+
+    /* Status Colors with gradient backgrounds */
+    .status-open { 
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+    }
+    .status-in_progress { 
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+    .status-completed { 
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+    }
+    .status-cancelled { 
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: var(--card-border-radius);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        grid-column: 1 / -1;
+    }
+
+    .empty-illustration {
+        font-size: 3.5rem;
+        color: #6366f1;
+        opacity: 0.8;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        font-size: 0.975rem;
+    }
+
+    /* Dark theme support */
+    [data-theme="dark"] {
+        .section-header {
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.1), transparent);
+            border-color: #334155;
+        }
+
+        .project-card, .empty-state {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .project-title, .section-title {
+            color: #e2e8f0;
+        }
+
+        .project-detail-item {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .detail-value {
+            color: #e2e8f0;
+        }
+
+        .link-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        .filter-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const status = btn.dataset.status;
+
+            // Filter projects
+            projectCards.forEach(card => {
+                if (status === 'all' || card.dataset.status === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 
